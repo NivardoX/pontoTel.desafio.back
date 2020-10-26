@@ -7,10 +7,12 @@ Flask-SQLAlchemy
 Jinja2
 psycopg2-binary
 SQLAlchemy
-Werkzeug
+Werkzeug==0.16.1
 python-dotenv
 Flask-Script
 black
 gunicorn
 marshmallow
-
+flask-swagger
+flask-restplus
+pytest
