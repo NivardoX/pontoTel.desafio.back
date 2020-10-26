@@ -1,0 +1,16 @@
+alembic
+Flask
+Flask-Cors
+Flask-JWT
+Flask-JWT-Extended
+Flask-SQLAlchemy
+Jinja2
+psycopg2-binary
+SQLAlchemy
+Werkzeug
+python-dotenv
+Flask-Script
+black
+gunicorn
+marshmallow
+
