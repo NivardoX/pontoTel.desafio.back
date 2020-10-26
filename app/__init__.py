@@ -6,7 +6,7 @@ from flask_script import Manager
 
 app = Flask(__name__)
 CORS(app, resources={"*": {"origins": "*"}})
-app.config.from_object('config')
+app.config.from_object("config")
 jwt = JWTManager(app)
 
 manager = Manager(app)
