@@ -19,6 +19,6 @@ while True:
     try:
         response = YahooApi((message)).get_price()
     except Exception as e:
-        socket.send_json({"has_error":True,"message":str(e)})
+        socket.send_json({"has_error": True, "message": str(e)})
     finally:
         socket.send_json({"has_error": False, "price": float(response)})

@@ -1,9 +1,9 @@
+import json
+
 from yahooquery import Ticker, search, get_trending
 
 from app.components.exceptions.SymbolNotFoundException import SymbolNotFoundException
 from app.components.wrappers.symbol_required import symbol_required
-
-
 
 
 class YahooApi:
@@ -22,17 +22,16 @@ class YahooApi:
             else:
                 raise
 
-
-    def check_symbol(self,symbol):
+    def check_symbol(self, symbol):
         print("CHECANDO {}".format(symbol))
         price = self.ticker.price
         print(price)
         if type(price[symbol]) != dict:
             raise SymbolNotFoundException(price[symbol])
 
-    def extract_prefix(self,symbol):
+    def extract_prefix(self, symbol):
         if symbol.endswith(".SA"):
-            return symbol.split('.')[0]
+            return symbol.split(".")[0]
         else:
             return symbol
 
@@ -59,15 +58,13 @@ class YahooApi:
             raise Exception
 
         return self.ticker.summary_detail
+
     @symbol_required
-    def historic(self,*args,**nargs):
-        return self.ticker.history(args,nargs)
+    def historic(self, period, interval):
+        return self.ticker.history(period=period, interval=interval)
 
     def search(self, data):
         return search("stock", country="brazil")
 
     def trending(self):
         return get_trending("brazil")
-
-if __name__ == '__main__':
-    print(YahooApi("^BVSP").historic("1d"))

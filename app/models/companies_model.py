@@ -8,7 +8,7 @@ class Company(db.Model):
     name = db.Column(db.String(255), nullable=False)
     symbol = db.Column(db.String(255), unique=True, nullable=False)
     peso = db.Column(db.Float)
-
+    populated = db.Column(db.BOOLEAN, default=False, nullable=False)
     # quotes = db.relationship("Quote", backref="quotes", lazy=True)
 
     # --------------------------------------------------------------------------------------------------#

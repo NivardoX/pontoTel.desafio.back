@@ -18,7 +18,7 @@ from werkzeug.security import check_password_hash
 from app.schemas.auth_schema import AuthSchema
 
 
-@app.route("/auth",methods=["POST"])
+@app.route("/auth", methods=["POST"])
 def login():
     data = request.get_json()
     errors = AuthSchema().validate(data)
@@ -29,7 +29,7 @@ def login():
                 {
                     "message": Messages.FORM_VALIDATION_ERROR,
                     "errors": errors,
-                    "has_error": True
+                    "has_error": True,
                 }
             ),
             200,
@@ -44,22 +44,12 @@ def login():
 
     if not user:
         return (
-            jsonify(
-                {
-                    "message": Messages.AUTH_USER_NOT_FOUND,
-                    "has_error": True
-                }
-            ),
+            jsonify({"message": Messages.AUTH_USER_NOT_FOUND, "has_error": True}),
             200,
         )
     elif not check_password_hash(user.password, ppassword):
         return (
-            jsonify(
-                {
-                    "message": Messages.AUTH_USER_PASS_ERROR,
-                    "has_error": True
-                }
-            ),
+            jsonify({"message": Messages.AUTH_USER_PASS_ERROR, "has_error": True}),
             200,
         )
 
@@ -69,7 +59,7 @@ def login():
                 "access_token": create_access_token(identity=user.id),
                 "refresh_token": create_refresh_token(identity=user.id),
                 "user_role": user.role_id,
-                "has_error":False
+                "has_error": False,
             }
         ),
         200,
@@ -79,11 +69,9 @@ def login():
 # --------------------------------------------------------------------------------------------------#
 
 
-@app.route("/refresh",methods=["POST"])
+@app.route("/refresh", methods=["POST"])
 @jwt_refresh_token_required
 def refresh():
     current_user = get_jwt_identity()
 
     return jsonify({"access_token": create_access_token(identity=current_user)}), 200
-
-

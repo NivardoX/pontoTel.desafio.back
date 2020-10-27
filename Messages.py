@@ -4,9 +4,7 @@ REGISTER_SUCCESS_DELETED = "Registro de {} excluído com sucesso."
 REGISTER_CREATE_INTEGRITY_ERROR = (
     "Não foi possível criar o registro. Verifique os dados e tente novamente."
 )
-REGISTER_CHANGE_INTEGRITY_ERROR = (
-    "Não foi possível modificar o registro. Verifique se há dados vinculados com ele e tente novamente."
-)
+REGISTER_CHANGE_INTEGRITY_ERROR = "Não foi possível modificar o registro. Verifique se há dados vinculados com ele e tente novamente."
 REGISTER_DELETE_INTEGRITY_ERROR = (
     "Não foi possível excluir o registro. Verifique os dados e tente novamente."
 )
@@ -22,7 +20,9 @@ FORM_DATE_MONTH_ERROR = FORM_GENERIC_INVALIDATION_ERROR.format("mês")
 FORM_DATE_YEAR_ERROR = FORM_GENERIC_INVALIDATION_ERROR.format("ano")
 FORM_HOUR_ERROR = FORM_GENERIC_INVALIDATION_ERROR.format("campo de hora")
 
-FORM_FLOAT_ERROR                = "O campo deve ser um valor de ponto flutuante com apenas 1 ponto ou virgula."
+FORM_FLOAT_ERROR = (
+    "O campo deve ser um valor de ponto flutuante com apenas 1 ponto ou virgula."
+)
 
 
 FORM_DATE_ERROR = "A data informada é inválida."
@@ -39,3 +39,4 @@ AUTH_USER_DENIED = "O usuário não possui permissão para acessar a URL solicit
 
 FORM_ADDITIONAL_VALIDATION_ERROR = "Ocorrrem erros no cadastro de {}."
 NO_VALUE_ERROR = "Não há valor vigente para essa turma"
+COULD_NOT_POPULATE_DATA = "Não foi possível popular o banco com o histórico de dados."

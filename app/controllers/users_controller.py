@@ -48,9 +48,9 @@ def userAll():
         data["role"]["name"] = user.roles.name
         data["role_nome"] = user.roles.name
 
-        if data['role_id'] == 3 and user.professor_id != None:
+        if data["role_id"] == 3 and user.professor_id != None:
             data["professor_id"] = user.professor_id
-            data['professor_nome'] = user.professor.nome
+            data["professor_nome"] = user.professor.nome
 
         output["itens"].append(data)
 
@@ -80,9 +80,9 @@ def userView(user_id):
     data["role"]["id"] = user.roles.id
     data["role"]["name"] = user.roles.name
     data["role_nome"] = user.roles.name
-    if data['role_id'] == 3 and user.professor_id != None:
+    if data["role_id"] == 3 and user.professor_id != None:
         data["professor_id"] = user.professor_id
-        data['professor_nome'] = user.professor.nome
+        data["professor_nome"] = user.professor.nome
     return jsonify(data)
 
 
@@ -185,8 +185,8 @@ def userEdit(user_id):
     user.email = data["email"]
     user.role_id = data["role_id"]
 
-    if (data['role_id'] == '3' or data['role_id'] == 3):
-        user.professor_id = data['professor_id']
+    if data["role_id"] == "3" or data["role_id"] == 3:
+        user.professor_id = data["professor_id"]
     else:
         user.professor_id = None
 

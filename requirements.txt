@@ -11,4 +11,5 @@ flask_sqlalchemy
 alembic
 manage.py
 pyzmq
+matplotlib
 

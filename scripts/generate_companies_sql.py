@@ -66,10 +66,10 @@ ECORODOVIAS	ECOR3	Bens industriais	0,13%
 SMILES	SMLS3	Diversos	0,13%"""
 
 companies = companies.split("\n")
-companies =[i.split("\t") for i in companies]
+companies = [i.split("\t") for i in companies]
 
 template = "INSERT INTO companies (name,symbol,peso) VALUES ('{}','{}','{}');"
 for company in companies:
     peso = company[3][:-2]
-    peso = peso.replace(',',".")
-    print(template.format(company[0],company[1],peso))
+    peso = peso.replace(",", ".")
+    print(template.format(company[0], company[1], peso))
