@@ -3,6 +3,9 @@ import os
 
 load_dotenv()
 
+default = 'postgresql://postgres:123@localhost:5432/guerreirinhos'
+
+SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', default)
 # --------------------------------------------------------------------------------------------------#
 
 DEBUG = True
