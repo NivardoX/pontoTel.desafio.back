@@ -76,6 +76,7 @@ def refresh():
 
     return jsonify({"access_token": create_access_token(identity=current_user)}), 200
 
+
 @app.route("/me", methods=["GET"])
 @jwt_required
 def me():

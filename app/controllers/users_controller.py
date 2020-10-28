@@ -34,7 +34,7 @@ def userAll():
             "current": pagination.page,
         },
         "itens": [],
-        'has_error': False,
+        "has_error": False,
     }
 
     for user in users:
@@ -66,10 +66,10 @@ def userView(user_id):
 
     if not user:
         return jsonify(
-            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), 'has_error': True}
+            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), "has_error": True}
         )
 
-    data = {'has_error': False}
+    data = {"has_error": False}
     data["id"] = user.id
     data["username"] = user.username
     data["email"] = user.email
@@ -98,11 +98,10 @@ def userAdd():
     if errors:
         print(errors)
         return (
-
             jsonify(
                 {
                     "message": Messages.FORM_VALIDATION_ERROR,
-                    'has_error': True,
+                    "has_error": True,
                     "errors": errors,
                 }
             ),
@@ -116,11 +115,11 @@ def userAdd():
         password=hashed_pass,
         role_id=data["role_id"],
         email=data["email"],
-        name=data['name']
+        name=data["name"],
     )
     db.session.add(user)
     db.session.flush()
-    user_ibov_privilege = UserCompanyPrivilege(user.id,67)
+    user_ibov_privilege = UserCompanyPrivilege(user.id, 67)
     db.session.add(user_ibov_privilege)
 
     try:
@@ -128,13 +127,13 @@ def userAdd():
         return jsonify(
             {
                 "message": Messages.REGISTER_SUCCESS_CREATED.format("Usuário"),
-                'has_error': False,
+                "has_error": False,
             }
         )
     except exc.IntegrityError:
         db.session.rollback()
         return jsonify(
-            {"message": Messages.REGISTER_CREATE_INTEGRITY_ERROR, 'has_error': True}
+            {"message": Messages.REGISTER_CREATE_INTEGRITY_ERROR, "has_error": True}
         )
 
 
@@ -149,19 +148,18 @@ def userEdit(user_id):
 
     if not user:
         return jsonify(
-            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), 'has_error': True}
+            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), "has_error": True}
         )
 
     data = request.get_json()
     errors = UserSchema().validate(data)
-
 
     if errors:
         return (
             jsonify(
                 {
                     "message": Messages.FORM_VALIDATION_ERROR,
-                    'has_error': True,
+                    "has_error": True,
                     "errors": errors,
                 }
             ),
@@ -183,13 +181,13 @@ def userEdit(user_id):
         return jsonify(
             {
                 "message": Messages.REGISTER_SUCCESS_UPDATED.format("Usuário"),
-                'has_error': False,
+                "has_error": False,
             }
         )
     except exc.IntegrityError:
         db.session.rollback()
         return jsonify(
-            {"message": Messages.REGISTER_CHANGE_INTEGRITY_ERROR, 'has_error': True}
+            {"message": Messages.REGISTER_CHANGE_INTEGRITY_ERROR, "has_error": True}
         )
 
 
@@ -204,10 +202,10 @@ def userDelete(user_id):
 
     if not user:
         return jsonify(
-            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), 'has_error': True}
+            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), "has_error": True}
         )
 
-    UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id==user_id).delete()
+    UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id == user_id).delete()
     db.session.delete(user)
 
     try:
@@ -215,10 +213,10 @@ def userDelete(user_id):
         return jsonify(
             {
                 "message": Messages.REGISTER_SUCCESS_DELETED.format("Usuário"),
-                'has_error': False,
+                "has_error": False,
             }
         )
     except exc.IntegrityError:
         return jsonify(
-            {"message": Messages.REGISTER_DELETE_INTEGRITY_ERROR, 'has_error': True}
+            {"message": Messages.REGISTER_DELETE_INTEGRITY_ERROR, "has_error": True}
         )

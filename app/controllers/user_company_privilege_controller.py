@@ -179,9 +179,7 @@ def UsercompanyprivilegeAdd():
 # -------------------------
 
 
-@app.route(
-    "/user-company-privilege/<usercompanyprivilege_id>", methods=["DELETE"]
-)
+@app.route("/user-company-privilege/<usercompanyprivilege_id>", methods=["DELETE"])
 def UsercompanyprivilegeDelete(usercompanyprivilege_id):
     usercompanyprivilege = UserCompanyPrivilege.query.get(usercompanyprivilege_id)
 

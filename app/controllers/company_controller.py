@@ -49,9 +49,16 @@ def CompanyAll():
 
     user = get_jwt_identity()
     print(user)
-    allowed_companies = [i.company_id for i in UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id==user).all()]
+    allowed_companies = [
+        i.company_id
+        for i in UserCompanyPrivilege.query.filter(
+            UserCompanyPrivilege.user_id == user
+        ).all()
+    ]
     print(allowed_companies)
-    query = Company.query.filter(Company.id.in_(allowed_companies)).order_by(Company.peso.desc())
+    query = Company.query.filter(Company.id.in_(allowed_companies)).order_by(
+        Company.peso.desc()
+    )
 
     if idFilter != None:
         query = query.filter(Company.id == idFilter)
@@ -100,8 +107,12 @@ def CompanyAll():
 @app.route("/company/<company_id>", methods=["GET"])
 def CompanyView(company_id):
     user = get_jwt_identity()
-    allowed_companies = [i.company_id for i in
-                         UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id == user).all()]
+    allowed_companies = [
+        i.company_id
+        for i in UserCompanyPrivilege.query.filter(
+            UserCompanyPrivilege.user_id == user
+        ).all()
+    ]
     if company_id in allowed_companies:
         company = Company.query.get(company_id)
     else:
@@ -129,11 +140,16 @@ def CompanyHistory(symbol):
     cursor = request.args.get("cursor", None, type=str)
 
     user = get_jwt_identity()
-    allowed_companies = [i.company_id for i in
-                         UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id == user).all()]
+    allowed_companies = [
+        i.company_id
+        for i in UserCompanyPrivilege.query.filter(
+            UserCompanyPrivilege.user_id == user
+        ).all()
+    ]
 
-    company = Company.query.filter(Company.symbol == symbol and Company.id.in_(allowed_companies)).first()
-
+    company = Company.query.filter(
+        Company.symbol == symbol and Company.id.in_(allowed_companies)
+    ).first()
 
     if not company:
         return jsonify(
@@ -193,8 +209,12 @@ def CompanyHistory(symbol):
 def CompanyEdit(company_id):
     user = get_jwt_identity()
 
-    allowed_companies = [i.company_id for i in
-                         UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id == user).all()]
+    allowed_companies = [
+        i.company_id
+        for i in UserCompanyPrivilege.query.filter(
+            UserCompanyPrivilege.user_id == user
+        ).all()
+    ]
     if company_id in allowed_companies:
         company = Company.query.get(company_id)
     else:

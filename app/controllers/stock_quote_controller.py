@@ -29,7 +29,7 @@ def get_stock_details(symbol):
         print("excpetion {}".format(e))
 
     yahoo = YahooApi(symbol)
-    return jsonify( yahoo.get_details()[symbol])
+    return jsonify(yahoo.get_details()[symbol])
 
 
 @app.route("/stock/<symbol>/quote", methods=["GET"])

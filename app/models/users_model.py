@@ -13,7 +13,7 @@ class User(db.Model):
 
     # --------------------------------------------------------------------------------------------------#
 
-    def __init__(self, username, password, email, role_id,name):
+    def __init__(self, username, password, email, role_id, name):
         self.username = username
         self.password = password
         self.email = email
