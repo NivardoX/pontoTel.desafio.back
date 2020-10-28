@@ -124,7 +124,7 @@ def patch_roles(id):
         )
 
 
-@app.route("/roles/<id>")
+@app.route("/role/<id>",methods=["GET"])
 def get_role(id):
 
     roles = Role.query.get(id)
@@ -138,10 +138,8 @@ def get_role(id):
     return jsonify(data)
 
 
-@app.param(
-    "id", description="query param id just for get method", schema={"type": "integer"}
-)
-def delete(self, id):
+@app.route("/roles/<id>",methods=["DELETE"])
+def delete_role(self, id):
 
     roles = Role.query.get(id)
 

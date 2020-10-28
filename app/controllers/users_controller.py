@@ -1,19 +1,19 @@
 from pprint import pprint
 
-from app import app, db, Messages, User
+from app import app, db, Messages, User, UserCompanyPrivilege
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required
 from sqlalchemy import exc
 from werkzeug.security import generate_password_hash
 
 from app.components.wrappers.resource import resource
+from app.schemas.user_schema import UserSchema
 
 
-@app.route("/user/all", methods=["GET"])
+@app.route("/users", methods=["GET"])
 @jwt_required
 @resource("users-all")
 def userAll():
-
     page = request.args.get("page", 1, type=int)
     usernameFilter = request.args.get("username", None)
     rowsPerPage = app.config["ROWS_PER_PAGE"]
@@ -34,7 +34,7 @@ def userAll():
             "current": pagination.page,
         },
         "itens": [],
-        "error": False,
+        'has_error': False,
     }
 
     for user in users:
@@ -43,14 +43,12 @@ def userAll():
         data["username"] = user.username
         data["email"] = user.email
         data["role_id"] = user.role_id
+        data["name"] = user.name
+
         data["role"] = {}
         data["role"]["id"] = user.roles.id
         data["role"]["name"] = user.roles.name
         data["role_nome"] = user.roles.name
-
-        if data["role_id"] == 3 and user.professor_id != None:
-            data["professor_id"] = user.professor_id
-            data["professor_nome"] = user.professor.nome
 
         output["itens"].append(data)
 
@@ -60,7 +58,7 @@ def userAll():
 # --------------------------------------------------------------------------------------------------#
 
 
-@app.route("/user/view/<user_id>", methods=["GET"])
+@app.route("/user/<user_id>", methods=["GET"])
 @jwt_required
 @resource("users-view")
 def userView(user_id):
@@ -68,57 +66,43 @@ def userView(user_id):
 
     if not user:
         return jsonify(
-            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), "error": True}
+            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), 'has_error': True}
         )
 
-    data = {"error": False}
+    data = {'has_error': False}
     data["id"] = user.id
     data["username"] = user.username
     data["email"] = user.email
     data["role_id"] = user.role_id
+    data["name"] = user.name
+
     data["role"] = {}
     data["role"]["id"] = user.roles.id
     data["role"]["name"] = user.roles.name
     data["role_nome"] = user.roles.name
-    if data["role_id"] == 3 and user.professor_id != None:
-        data["professor_id"] = user.professor_id
-        data["professor_nome"] = user.professor.nome
+
     return jsonify(data)
 
 
 # --------------------------------------------------------------------------------------------------#
 
 
-@app.route("/user/add", methods=["POST"])
+@app.route("/user", methods=["POST"])
 @jwt_required
 @resource("users-add")
 def userAdd():
     data = request.get_json()
-    validator = UserValidator(data)
-    validator.addPasswordField()
 
-    errors = validator.validate()
+    errors = UserSchema().validate(data)
 
-    if errors["has"]:
+    if errors:
+        print(errors)
         return (
+
             jsonify(
                 {
                     "message": Messages.FORM_VALIDATION_ERROR,
-                    "error": errors["has"],
-                    "errors": errors,
-                }
-            ),
-            200,
-        )
-
-    errors = validator.validateUsername()
-
-    if errors["has"]:
-        return (
-            jsonify(
-                {
-                    "message": Messages.FORM_VALIDATION_ERROR,
-                    "error": errors["has"],
+                    'has_error': True,
                     "errors": errors,
                 }
             ),
@@ -126,35 +110,38 @@ def userAdd():
         )
 
     hashed_pass = generate_password_hash(data["password"], method="sha256")
+
     user = User(
         username=data["username"],
         password=hashed_pass,
         role_id=data["role_id"],
-        professor_id=data["professor_id"] if "professor_id" in data else None,
         email=data["email"],
+        name=data['name']
     )
-
     db.session.add(user)
+    db.session.flush()
+    user_ibov_privilege = UserCompanyPrivilege(user.id,67)
+    db.session.add(user_ibov_privilege)
 
     try:
         db.session.commit()
         return jsonify(
             {
                 "message": Messages.REGISTER_SUCCESS_CREATED.format("Usuário"),
-                "error": False,
+                'has_error': False,
             }
         )
     except exc.IntegrityError:
         db.session.rollback()
         return jsonify(
-            {"message": Messages.REGISTER_CREATE_INTEGRITY_ERROR, "error": True}
+            {"message": Messages.REGISTER_CREATE_INTEGRITY_ERROR, 'has_error': True}
         )
 
 
 # --------------------------------------------------------------------------------------------------#
 
 
-@app.route("/user/edit/<user_id>", methods=["PUT"])
+@app.route("/user/<user_id>", methods=["PUT"])
 @jwt_required
 @resource("users-edit")
 def userEdit(user_id):
@@ -162,19 +149,19 @@ def userEdit(user_id):
 
     if not user:
         return jsonify(
-            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), "error": True}
+            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), 'has_error': True}
         )
 
     data = request.get_json()
-    validator = UserValidator(data)
-    errors = validator.validate()
+    errors = UserSchema().validate(data)
 
-    if errors["has"]:
+
+    if errors:
         return (
             jsonify(
                 {
                     "message": Messages.FORM_VALIDATION_ERROR,
-                    "error": errors["has"],
+                    'has_error': True,
                     "errors": errors,
                 }
             ),
@@ -182,6 +169,7 @@ def userEdit(user_id):
         )
 
     user.username = data["username"]
+    user.name = data["name"]
     user.email = data["email"]
     user.role_id = data["role_id"]
 
@@ -195,20 +183,20 @@ def userEdit(user_id):
         return jsonify(
             {
                 "message": Messages.REGISTER_SUCCESS_UPDATED.format("Usuário"),
-                "error": False,
+                'has_error': False,
             }
         )
     except exc.IntegrityError:
         db.session.rollback()
         return jsonify(
-            {"message": Messages.REGISTER_CHANGE_INTEGRITY_ERROR, "error": True}
+            {"message": Messages.REGISTER_CHANGE_INTEGRITY_ERROR, 'has_error': True}
         )
 
 
 # --------------------------------------------------------------------------------------------------#
 
 
-@app.route("/user/delete/<user_id>", methods=["DELETE"])
+@app.route("/user/<user_id>", methods=["DELETE"])
 @jwt_required
 @resource("users-delete")
 def userDelete(user_id):
@@ -216,9 +204,10 @@ def userDelete(user_id):
 
     if not user:
         return jsonify(
-            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), "error": True}
+            {"message": Messages.REGISTER_NOT_FOUND.format(user_id), 'has_error': True}
         )
 
+    UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id==user_id).delete()
     db.session.delete(user)
 
     try:
@@ -226,10 +215,10 @@ def userDelete(user_id):
         return jsonify(
             {
                 "message": Messages.REGISTER_SUCCESS_DELETED.format("Usuário"),
-                "error": False,
+                'has_error': False,
             }
         )
     except exc.IntegrityError:
         return jsonify(
-            {"message": Messages.REGISTER_DELETE_INTEGRITY_ERROR, "error": True}
+            {"message": Messages.REGISTER_DELETE_INTEGRITY_ERROR, 'has_error': True}
         )

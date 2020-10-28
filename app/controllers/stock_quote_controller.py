@@ -1,5 +1,8 @@
 import json
+import time
+import traceback
 
+import zmq
 from flask import render_template, jsonify
 
 from app import app, socket
@@ -13,14 +16,20 @@ def get_stock_details(symbol):
     This docstring will show up as the description and short-description
     for the openapi docs for this route.
     """
-
     socket.send_string(symbol)
 
-    message = socket.recv()
+    time.sleep(1)
+    try:
+        message = socket.recv()
+        return jsonify(json.loads(message.decode("utf-8")))
 
-    return jsonify(json.loads(message.decode("utf-8")))
-    # yahoo = YahooApi(symbol)
-    # return jsonify( yahoo.get_details()[symbol])
+    except zmq.ZMQError:
+        print("error while receivin message")
+    except Exception as e:
+        print("excpetion {}".format(e))
+
+    yahoo = YahooApi(symbol)
+    return jsonify( yahoo.get_details()[symbol])
 
 
 @app.route("/stock/<symbol>/quote", methods=["GET"])

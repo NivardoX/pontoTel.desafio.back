@@ -1,3 +1,5 @@
+from time import strftime
+
 from app import db
 
 
@@ -8,9 +10,9 @@ class Quote(db.Model):
     price_opened = db.Column(db.Float)
     price_closed = db.Column(db.Float)
     price = db.Column(db.Float)
-    date = db.Column(db.DateTime, nullable=False, unique=True)
+    date = db.Column(db.DateTime, nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey("companies.id"))
-
+    db.UniqueConstraint('quotes.date', 'quotes.company_id', name='quote_date_company_constraint')
     # --------------------------------------------------------------------------------------------------#
 
     def __init__(
@@ -30,5 +32,5 @@ class Quote(db.Model):
     def dict(self):
         dictret = dict(self.__dict__)
         dictret.pop("_sa_instance_state", None)
-
+        dictret["date"] = int(self.date.strftime("%s")+"000")
         return dictret

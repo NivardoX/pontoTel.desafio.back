@@ -6,7 +6,7 @@ from app import UserCompanyPrivilege, app, db
 from app.schemas.user_company_privilege_schema import UserCompanyPrivilegeSchema
 
 
-@app.route("/user-company-privilege/all", methods=["GET"])
+@app.route("/user-company-privileges", methods=["GET"])
 def UsercompanyprivilegeAll():
     rowsPerPage = request.args.get(
         "rows_per_page", app.config["ROWS_PER_PAGE"], type=int
@@ -58,7 +58,7 @@ def UsercompanyprivilegeAll():
 # -------------------------
 
 
-@app.route("/user-company-privilege/view/<usercompanyprivilege_id>", methods=["GET"])
+@app.route("/user-company-privilege/<usercompanyprivilege_id>", methods=["GET"])
 def UsercompanyprivilegeView(usercompanyprivilege_id):
     usercompanyprivilege = UserCompanyPrivilege.query.get(usercompanyprivilege_id)
 
@@ -82,7 +82,7 @@ def UsercompanyprivilegeView(usercompanyprivilege_id):
 # -------------------------
 
 
-@app.route("/user-company-privilege/edit/<usercompanyprivilege_id>", methods=["PUT"])
+@app.route("/user-company-privilege/<usercompanyprivilege_id>", methods=["PUT"])
 def UsercompanyprivilegeEdit(usercompanyprivilege_id):
     usercompanyprivilege = UserCompanyPrivilege.query.get(usercompanyprivilege_id)
 
@@ -133,7 +133,7 @@ def UsercompanyprivilegeEdit(usercompanyprivilege_id):
 # -------------------------
 
 
-@app.route("/user-company-privilege/add", methods=["POST"])
+@app.route("/user-company-privilege", methods=["POST"])
 def UsercompanyprivilegeAdd():
     data = request.get_json()
 
@@ -180,7 +180,7 @@ def UsercompanyprivilegeAdd():
 
 
 @app.route(
-    "/user-company-privilege/delete/<usercompanyprivilege_id>", methods=["DELETE"]
+    "/user-company-privilege/<usercompanyprivilege_id>", methods=["DELETE"]
 )
 def UsercompanyprivilegeDelete(usercompanyprivilege_id):
     usercompanyprivilege = UserCompanyPrivilege.query.get(usercompanyprivilege_id)

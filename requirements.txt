@@ -12,4 +12,6 @@ alembic
 manage.py
 pyzmq
 matplotlib
+flask_cors
+flask-restplus
 

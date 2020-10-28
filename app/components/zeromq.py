@@ -13,9 +13,7 @@ while True:
     #  Wait for next request from client
     print("CONNECTED")
     message = socket.recv()
-    print("Received request: %s" % message)
     message = message.decode("UTF-8")
-    #  Do some 'work'
     try:
         response = YahooApi((message)).get_price()
     except Exception as e:

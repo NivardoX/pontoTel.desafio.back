@@ -39,6 +39,15 @@ class TimeSeries:
                         price=None,
                     )
                     session.add(quote)
+            else:
+                quote = Quote(
+                    date,
+                    company.id,
+                    price_opened=opened,
+                    price_closed=closed,
+                    price=None,
+                )
+                session.add(quote)
 
         try:
             session.commit()

@@ -2,10 +2,11 @@ import traceback
 from datetime import datetime, timedelta
 
 from flask import render_template, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import exc
 
 import Messages
-from app import app, db, Quote
+from app import app, db, Quote, UserCompanyPrivilege
 from app.components.time_series import TimeSeries
 from app.components.yahooApi import YahooApi
 from app.models.companies_model import Company as company, Company
@@ -35,9 +36,10 @@ def index():
 
 
 @app.route("/companies", methods=["GET"])
+@jwt_required
 def CompanyAll():
     rowsPerPage = request.args.get(
-        "rows_per_page", app.config["ROWS_PER_PAGE"], type=int
+        "ROWS_PER_PAGE", app.config["ROWS_PER_PAGE"], type=int
     )
     page = request.args.get("page", 1, type=int)
     idFilter = request.args.get("id", None)
@@ -45,7 +47,11 @@ def CompanyAll():
     symbolFilter = request.args.get("symbol", None)
     pesoFilter = request.args.get("peso", None)
 
-    query = Company.query.order_by(Company.peso.desc())
+    user = get_jwt_identity()
+    print(user)
+    allowed_companies = [i.company_id for i in UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id==user).all()]
+    print(allowed_companies)
+    query = Company.query.filter(Company.id.in_(allowed_companies)).order_by(Company.peso.desc())
 
     if idFilter != None:
         query = query.filter(Company.id == idFilter)
@@ -93,7 +99,13 @@ def CompanyAll():
 
 @app.route("/company/<company_id>", methods=["GET"])
 def CompanyView(company_id):
-    company = Company.query.get(company_id)
+    user = get_jwt_identity()
+    allowed_companies = [i.company_id for i in
+                         UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id == user).all()]
+    if company_id in allowed_companies:
+        company = Company.query.get(company_id)
+    else:
+        company = None
 
     if not company:
         return jsonify(
@@ -116,13 +128,20 @@ def CompanyView(company_id):
 def CompanyHistory(symbol):
     cursor = request.args.get("cursor", None, type=str)
 
-    company = Company.query.filter(Company.symbol == symbol).first()
-    company_id = company.id
-    company_symbol = company.symbol
+    user = get_jwt_identity()
+    allowed_companies = [i.company_id for i in
+                         UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id == user).all()]
+
+    company = Company.query.filter(Company.symbol == symbol and Company.id.in_(allowed_companies)).first()
+
+
     if not company:
         return jsonify(
             {"message": Messages.REGISTER_NOT_FOUND.format(symbol), "has_error": True}
         )
+
+    company_id = company.id
+    company_symbol = company.symbol
 
     data = {"has_error": False}
     data["id"] = company.id
@@ -170,9 +189,16 @@ def CompanyHistory(symbol):
 # -------------------------
 
 
-@app.route("/company/<company_id>", methods=["PATCH"])
+@app.route("/company/<company_id>", methods=["PUT"])
 def CompanyEdit(company_id):
-    company = Company.query.get(company_id)
+    user = get_jwt_identity()
+
+    allowed_companies = [i.company_id for i in
+                         UserCompanyPrivilege.query.filter(UserCompanyPrivilege.user_id == user).all()]
+    if company_id in allowed_companies:
+        company = Company.query.get(company_id)
+    else:
+        company = None
 
     if not company:
         return jsonify(

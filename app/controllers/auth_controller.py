@@ -75,3 +75,24 @@ def refresh():
     current_user = get_jwt_identity()
 
     return jsonify({"access_token": create_access_token(identity=current_user)}), 200
+
+@app.route("/me", methods=["GET"])
+@jwt_required
+def me():
+    current_user = get_jwt_identity()
+    print(current_user)
+    user = User.query.get(current_user)
+    return (
+        jsonify(
+            {
+                "username": user.username,
+                "email": user.email,
+                "role_id": user.role_id,
+                "role": {"id": user.roles.id, "name": user.roles.name},
+            }
+        ),
+        200,
+    )
+
+
+# --------------------------------------------------------------------------------------------------#
