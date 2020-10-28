@@ -8,7 +8,7 @@ from sqlalchemy import exc
 import Messages
 from app import app, db, Quote, UserCompanyPrivilege
 from app.components.time_series import TimeSeries
-from app.components.yahooApi import YahooApi
+from app.components.yahoo_api import YahooApi
 from app.models.companies_model import Company as company, Company
 from app.schemas.company_schema import CompanySchema
 
@@ -42,7 +42,7 @@ def index():
 
 @app.route("/companies", methods=["GET"])
 @jwt_required
-def CompanyAll():
+def company_all():
     rowsPerPage = request.args.get(
         "ROWS_PER_PAGE", app.config["ROWS_PER_PAGE"], type=int
     )
@@ -53,14 +53,12 @@ def CompanyAll():
     pesoFilter = request.args.get("peso", None)
 
     user = get_jwt_identity()
-    print(user)
     allowed_companies = [
         i.company_id
         for i in UserCompanyPrivilege.query.filter(
             UserCompanyPrivilege.user_id == user
         ).all()
     ]
-    print(allowed_companies)
     query = Company.query.filter(Company.id.in_(allowed_companies)).order_by(
         Company.peso.desc()
     )
@@ -111,7 +109,7 @@ def CompanyAll():
 
 @app.route("/company/<company_id>", methods=["GET"])
 @jwt_required
-def CompanyView(company_id):
+def company_view(company_id):
     user = get_jwt_identity()
     allowed_companies = [
         i.company_id
@@ -143,7 +141,7 @@ def CompanyView(company_id):
 
 @app.route("/company/<symbol>/history", methods=["GET"])
 @jwt_required
-def CompanyHistory(symbol):
+def company_history(symbol):
     cursor = request.args.get("cursor", None, type=str)
 
     user = get_jwt_identity()
@@ -214,7 +212,7 @@ def CompanyHistory(symbol):
 
 @app.route("/company/<company_id>", methods=["PUT"])
 @jwt_required
-def CompanyEdit(company_id):
+def company_edit(company_id):
     user = get_jwt_identity()
 
     allowed_companies = [
@@ -276,7 +274,7 @@ def CompanyEdit(company_id):
 
 @app.route("/company", methods=["POST"])
 @jwt_required
-def CompanyAdd():
+def company_add():
     data = request.get_json()
     errors = CompanySchema().validate(data)
 
@@ -321,7 +319,7 @@ def CompanyAdd():
 
 
 @app.route("/company/<company_id>", methods=["DELETE"])
-def CompanyDelete(company_id):
+def company_delete(company_id):
 
     UserCompanyPrivilege.query.filter(
         UserCompanyPrivilege.company_id == company_id

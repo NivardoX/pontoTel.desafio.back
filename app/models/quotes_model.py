@@ -1,4 +1,7 @@
+from datetime import timedelta
 from time import strftime
+
+from pytz import timezone
 
 from app import db
 
@@ -34,5 +37,9 @@ class Quote(db.Model):
     def dict(self):
         dictret = dict(self.__dict__)
         dictret.pop("_sa_instance_state", None)
-        dictret["date"] = int(self.date.strftime("%s") + "000")
+
+        dictret["date"] = int((self.date-timedelta(hours=3)).strftime("%s") + "000")
         return dictret
+
+
+

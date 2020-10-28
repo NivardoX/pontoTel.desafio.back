@@ -4,14 +4,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from app import db, Company
-from app.components.yahooApi import YahooApi
+from app.components.yahoo_api import YahooApi
 from app.models.quotes_model import Quote
 
 
 class TimeSeries:
     def __init__(self, data, symbol):
         self.data = pd.DataFrame(data)
-        print(self.data)
         self.symbol = symbol
 
     def insert(self, start=None):

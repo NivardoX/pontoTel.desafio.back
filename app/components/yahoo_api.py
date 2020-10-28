@@ -4,7 +4,7 @@ import traceback
 from pandas import DataFrame
 from yahooquery import Ticker, search, get_trending
 
-from app.components.exceptions.SymbolNotFoundException import SymbolNotFoundException
+from app.components.exceptions.symbol_not_found_exception import SymbolNotFoundException
 from app.components.wrappers.symbol_required import symbol_required
 from typing import Optional
 
@@ -27,9 +27,7 @@ class YahooApi:
                     raise
 
     def check_symbol(self, symbol: str) -> None:
-        print("CHECANDO {}".format(symbol))
         price = self.ticker.price
-        print(price)
         if type(price[symbol]) != dict:
             raise SymbolNotFoundException(price[symbol])
 

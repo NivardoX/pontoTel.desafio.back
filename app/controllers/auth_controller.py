@@ -81,7 +81,6 @@ def refresh():
 @jwt_required
 def me():
     current_user = get_jwt_identity()
-    print(current_user)
     user = User.query.get(current_user)
     return (
         jsonify(

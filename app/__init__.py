@@ -36,10 +36,10 @@ socket.RCVTIMEO = 1000
 
 # --MODELS-- #
 from app.models.actions_model import *
-from app.models.privileges_table import *
-from app.models.resources_table import *
+from app.models.privileges_model import *
+from app.models.resources_model import *
 from app.models.users_model import *
-from app.models.roles_table import *
+from app.models.roles_model import *
 from app.models.controllers_model import *
 from app.models.quotes_model import *
 from app.models.companies_model import *

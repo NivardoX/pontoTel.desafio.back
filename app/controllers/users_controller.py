@@ -13,7 +13,7 @@ from app.schemas.user_schema import UserSchema
 @app.route("/users", methods=["GET"])
 @jwt_required
 @resource("users-all")
-def userAll():
+def user_all():
     page = request.args.get("page", 1, type=int)
     usernameFilter = request.args.get("username", None)
     rowsPerPage = app.config["ROWS_PER_PAGE"]
@@ -61,7 +61,7 @@ def userAll():
 @app.route("/user/<user_id>", methods=["GET"])
 @jwt_required
 @resource("users-view")
-def userView(user_id):
+def user_view(user_id):
     user = User.query.get(user_id)
 
     if not user:
@@ -90,13 +90,12 @@ def userView(user_id):
 @app.route("/user", methods=["POST"])
 @jwt_required
 @resource("users-add")
-def userAdd():
+def user_add():
     data = request.get_json()
 
     errors = UserSchema().validate(data)
 
     if errors:
-        print(errors)
         return (
             jsonify(
                 {
@@ -143,7 +142,7 @@ def userAdd():
 @app.route("/user/<user_id>", methods=["PUT"])
 @jwt_required
 @resource("users-edit")
-def userEdit(user_id):
+def user_edit(user_id):
     user = User.query.get(user_id)
 
     if not user:
@@ -197,7 +196,7 @@ def userEdit(user_id):
 @app.route("/user/<user_id>", methods=["DELETE"])
 @jwt_required
 @resource("users-delete")
-def userDelete(user_id):
+def user_delete(user_id):
     user = User.query.get(user_id)
 
     if not user:

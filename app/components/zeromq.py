@@ -2,7 +2,7 @@ import json
 import time
 import zmq
 
-from app.components.yahooApi import YahooApi
+from app.components.yahoo_api import YahooApi
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
@@ -18,5 +18,5 @@ while True:
         response = YahooApi((message)).get_price()
     except Exception as e:
         socket.send_json({"has_error": True, "message": str(e)})
-    finally:
+    else:
         socket.send_json({"has_error": False, "price": float(response)})

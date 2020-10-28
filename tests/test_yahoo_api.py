@@ -1,8 +1,8 @@
-from app.components.exceptions.SymbolNotDefinedException import (
+from app.components.exceptions.symbol_not_defined_exception import (
     SymbolNotDefinedException,
 )
-from app.components.exceptions.SymbolNotFoundException import SymbolNotFoundException
-from app.components.yahooApi import YahooApi
+from app.components.exceptions.symbol_not_found_exception import SymbolNotFoundException
+from app.components.yahoo_api import YahooApi
 import pytest
 
 

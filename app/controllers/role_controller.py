@@ -3,7 +3,7 @@ from sqlalchemy import exc
 
 import Messages
 from app import app, db
-from app.models.roles_table import Role
+from app.models.roles_model import Role
 from app.schemas.roles_schema import RolesSchema
 
 

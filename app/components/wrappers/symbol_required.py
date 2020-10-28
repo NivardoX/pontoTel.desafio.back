@@ -1,6 +1,6 @@
 from typing import Callable
 
-from app.components.exceptions.SymbolNotDefinedException import (
+from app.components.exceptions.symbol_not_defined_exception import (
     SymbolNotDefinedException,
 )
 
