@@ -1,0 +1,2 @@
+class SymbolNotDefinedException(Exception):
+    pass

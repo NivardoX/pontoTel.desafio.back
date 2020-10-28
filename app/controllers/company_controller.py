@@ -13,8 +13,8 @@ from app.models.companies_model import Company as company, Company
 from app.schemas.company_schema import CompanySchema
 
 
-@app.route("/")
-def index():
+@app.route("/jinja")
+def jinja():
     """List companies
 
     List the x biggest companies
@@ -33,6 +33,11 @@ def index():
         {"nome": "LOJAS RENNER", "codigo": "LREN3", "peso": "2,15%"},
     ]
     return render_template("index.html", companies=companies, ibovespa=ibovespa)
+
+
+@app.route("/")
+def index():
+    return db.engine.url.database
 
 
 @app.route("/companies", methods=["GET"])
@@ -84,7 +89,7 @@ def CompanyAll():
             "current": pagination.page,
         },
         "itens": [],
-        "error": False,
+        "has_error": False,
     }
 
     for company in companys:
@@ -105,6 +110,7 @@ def CompanyAll():
 
 
 @app.route("/company/<company_id>", methods=["GET"])
+@jwt_required
 def CompanyView(company_id):
     user = get_jwt_identity()
     allowed_companies = [
@@ -113,7 +119,7 @@ def CompanyView(company_id):
             UserCompanyPrivilege.user_id == user
         ).all()
     ]
-    if company_id in allowed_companies:
+    if int(company_id) in allowed_companies:
         company = Company.query.get(company_id)
     else:
         company = None
@@ -136,6 +142,7 @@ def CompanyView(company_id):
 
 
 @app.route("/company/<symbol>/history", methods=["GET"])
+@jwt_required
 def CompanyHistory(symbol):
     cursor = request.args.get("cursor", None, type=str)
 
@@ -206,6 +213,7 @@ def CompanyHistory(symbol):
 
 
 @app.route("/company/<company_id>", methods=["PUT"])
+@jwt_required
 def CompanyEdit(company_id):
     user = get_jwt_identity()
 
@@ -215,7 +223,7 @@ def CompanyEdit(company_id):
             UserCompanyPrivilege.user_id == user
         ).all()
     ]
-    if company_id in allowed_companies:
+    if int(company_id) in allowed_companies:
         company = Company.query.get(company_id)
     else:
         company = None
@@ -267,6 +275,7 @@ def CompanyEdit(company_id):
 
 
 @app.route("/company", methods=["POST"])
+@jwt_required
 def CompanyAdd():
     data = request.get_json()
     errors = CompanySchema().validate(data)
@@ -286,6 +295,9 @@ def CompanyAdd():
     company = Company(name=data["name"], symbol=data["symbol"], peso=data["peso"])
 
     db.session.add(company)
+    db.session.flush()
+    user = get_jwt_identity()
+    db.session.add(UserCompanyPrivilege(user, company.id))
 
     try:
         db.session.commit()
@@ -296,6 +308,7 @@ def CompanyAdd():
             }
         )
     except exc.IntegrityError:
+        traceback.print_exc()
         db.session.rollback()
         return jsonify(
             {"message": Messages.REGISTER_CHANGE_INTEGRITY_ERROR, "has_error": True}
@@ -309,6 +322,11 @@ def CompanyAdd():
 
 @app.route("/company/<company_id>", methods=["DELETE"])
 def CompanyDelete(company_id):
+
+    UserCompanyPrivilege.query.filter(
+        UserCompanyPrivilege.company_id == company_id
+    ).delete()
+
     company = Company.query.get(company_id)
 
     if not company:
@@ -330,6 +348,7 @@ def CompanyDelete(company_id):
             }
         )
     except exc.IntegrityError:
+        traceback.print_exc()
         db.session.rollback()
         return jsonify(
             {"message": Messages.REGISTER_CHANGE_INTEGRITY_ERROR, "has_error": True}

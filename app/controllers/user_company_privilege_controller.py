@@ -7,7 +7,7 @@ from app.schemas.user_company_privilege_schema import UserCompanyPrivilegeSchema
 
 
 @app.route("/user-company-privileges", methods=["GET"])
-def UsercompanyprivilegeAll():
+def user_company_privlige_all():
     rowsPerPage = request.args.get(
         "rows_per_page", app.config["ROWS_PER_PAGE"], type=int
     )
@@ -58,14 +58,16 @@ def UsercompanyprivilegeAll():
 # -------------------------
 
 
-@app.route("/user-company-privilege/<usercompanyprivilege_id>", methods=["GET"])
-def UsercompanyprivilegeView(usercompanyprivilege_id):
-    usercompanyprivilege = UserCompanyPrivilege.query.get(usercompanyprivilege_id)
+@app.route("/user-company-privilege/<user_compant_privilege_id>", methods=["GET"])
+def user_company_privlige_view(user_compant_privilege_id):
+    usercompanyprivilege = UserCompanyPrivilege.query.get(user_compant_privilege_id)
 
     if not usercompanyprivilege:
         return jsonify(
             {
-                "message": Messages.REGISTER_NOT_FOUND.format(usercompanyprivilege_id),
+                "message": Messages.REGISTER_NOT_FOUND.format(
+                    user_compant_privilege_id
+                ),
                 "has_error": True,
             }
         )
@@ -78,63 +80,12 @@ def UsercompanyprivilegeView(usercompanyprivilege_id):
 
 
 # -------------------------
-# Edit
-# -------------------------
-
-
-@app.route("/user-company-privilege/<usercompanyprivilege_id>", methods=["PUT"])
-def UsercompanyprivilegeEdit(usercompanyprivilege_id):
-    usercompanyprivilege = UserCompanyPrivilege.query.get(usercompanyprivilege_id)
-
-    if not usercompanyprivilege:
-        return jsonify(
-            {
-                "message": Messages.REGISTER_NOT_FOUND.format(usercompanyprivilege_id),
-                "has_error": True,
-            }
-        )
-
-    data = request.get_json()
-    errors = UserCompanyPrivilegeSchema.validate(data)
-
-    if errors:
-        return (
-            jsonify(
-                {
-                    "message": Messages.FORM_VALIDATION_ERROR,
-                    "has_error": errors["has"],
-                    "errors": errors,
-                }
-            ),
-            200,
-        )
-    usercompanyprivilege.user_id = data["user_id"]
-    usercompanyprivilege.company_id = data["company_id"]
-
-    try:
-        db.session.commit()
-        return jsonify(
-            {
-                "message": Messages.REGISTER_SUCCESS_UPDATED.format(
-                    "UserCompanyPrivilege"
-                ),
-                "has_error": False,
-            }
-        )
-    except exc.IntegrityError:
-        db.session.rollback()
-        return jsonify(
-            {"message": Messages.REGISTER_CHANGE_INTEGRITY_ERROR, "has_error": True}
-        )
-
-
-# -------------------------
 # Add
 # -------------------------
 
 
 @app.route("/user-company-privilege", methods=["POST"])
-def UsercompanyprivilegeAdd():
+def user_company_privlige_add():
     data = request.get_json()
 
     data = request.get_json()
@@ -179,14 +130,16 @@ def UsercompanyprivilegeAdd():
 # -------------------------
 
 
-@app.route("/user-company-privilege/<usercompanyprivilege_id>", methods=["DELETE"])
-def UsercompanyprivilegeDelete(usercompanyprivilege_id):
-    usercompanyprivilege = UserCompanyPrivilege.query.get(usercompanyprivilege_id)
+@app.route("/user-company-privilege/<user_compant_privilege_id>", methods=["DELETE"])
+def user_company_privlige_delete(user_compant_privilege_id):
+    usercompanyprivilege = UserCompanyPrivilege.query.get(user_compant_privilege_id)
 
     if not usercompanyprivilege:
         return jsonify(
             {
-                "message": Messages.REGISTER_NOT_FOUND.format(usercompanyprivilege_id),
+                "message": Messages.REGISTER_NOT_FOUND.format(
+                    user_compant_privilege_id
+                ),
                 "has_error": True,
             }
         )

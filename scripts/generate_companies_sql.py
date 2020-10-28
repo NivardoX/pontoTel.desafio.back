@@ -68,7 +68,9 @@ SMILES	SMLS3	Diversos	0,13%"""
 companies = companies.split("\n")
 companies = [i.split("\t") for i in companies]
 
-template = "INSERT INTO companies (name,symbol,peso) VALUES ('{}','{}','{}');"
+template = (
+    "INSERT INTO companies (name,symbol,peso,populated) VALUES ('{}','{}','{}',false);"
+)
 for company in companies:
     peso = company[3][:-2]
     peso = peso.replace(",", ".")

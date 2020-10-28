@@ -1,3 +1,5 @@
+import os
+
 import zmq as zmq
 from flask import Flask
 from flask_migrate import Migrate, MigrateCommand
@@ -6,18 +8,22 @@ from flask_script import Manager
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
-
 import Messages
+from config import TEST_DB_URL
 
 app = Flask(__name__)
 CORS(app, resources={"*": {"origins": "*"}})
-
 app.config.from_object("config")
-jwt = JWTManager(app)
+if os.environ.get("STAGE", None) == "test":
+    app.config["SQLALCHEMY_DATABASE_URI"] = TEST_DB_URL
+
 db = SQLAlchemy(app)
+
+jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
 manager = Manager(app)
+
 manager.add_command("db", MigrateCommand)
 
 

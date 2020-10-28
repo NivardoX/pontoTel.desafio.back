@@ -2,8 +2,7 @@ openapi: "3.0.0"
 info:
   version: 1.0.0
   title: Pontotel Challenge - API
-  license:
-    name: MIT
+
 servers:
   - url: http:/200.150.129.6:5000
 paths:

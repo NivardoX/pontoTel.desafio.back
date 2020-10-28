@@ -9,9 +9,10 @@ from app import Resource
 from app import Privilege
 from app import Action
 from app import Controller
+from typing import Callable
 
 
-def resource(resource_name):
+def resource(resource_name: str) -> Callable:
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
