@@ -5,23 +5,13 @@ from flask_jwt_extended import JWTManager
 from flask_script import Manager
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-import werkzeug
-
-werkzeug.cached_property = werkzeug.utils.cached_property
-from flask_restplus import Api
 
 
 import Messages
 
 app = Flask(__name__)
 CORS(app, resources={"*": {"origins": "*"}})
-api = Api(
-    app,
-    title="Api Flask Experiments",
-    version="1.0",
-    description="Api de experimentos com python flask",
-    prefix="/api",
-)
+
 app.config.from_object("config")
 jwt = JWTManager(app)
 db = SQLAlchemy(app)

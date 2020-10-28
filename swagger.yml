@@ -1,0 +1,813 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Pontotel Challenge - API
+  license:
+    name: MIT
+servers:
+  - url: http:/200.150.129.6:5000
+paths:
+  /stock/{symbol}/price:
+    get:
+      summary: Get live price of stock
+      operationId: getStockPrice
+      tags:
+        - stock
+      parameters:
+        - name: symbol
+          in: path
+          description: symbol to query price
+          required: true
+          schema:
+            type: string
+
+
+      responses:
+        '200':
+          description: live price of stock
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stock"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /companies:
+    get:
+      summary: List all companies
+      operationId: listCompanies
+      tags:
+        - company
+      parameters:
+        - name: page
+          in: query
+          description: page to view
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: id
+          in: query
+          description: id to filter
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: name
+          in: query
+          description: name to filter
+          required: false
+          schema:
+            type: string
+            format: string
+        - name: symbol
+          in: query
+          description: symbol to filter
+          required: false
+          schema:
+            type: string
+        - name: peso
+          in: query
+          description: Weigth to filter
+          required: false
+          schema:
+            type: integer
+            format: int32
+
+      responses:
+        '200':
+          description: A paged array of companies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Companies"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a Company
+      operationId: createCompany
+      tags:
+        - company
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyIdless'
+      responses:
+        '200':
+          description: A success message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+  /company/{company_id}:
+    get:
+      summary: Info for a specific company
+      operationId: showPetById
+      tags:
+        - company
+      parameters:
+        - name: company_id
+          in: path
+          required: true
+          description: The id of the company to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a specific company
+      operationId: deletetCompany
+      tags:
+        - company
+      parameters:
+        - name: company_id
+          in: path
+          required: true
+          description: The id of the company to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Edit a specific company
+      operationId: editCompany
+      tags:
+        - company
+      parameters:
+        - name: company_id
+          in: path
+          required: true
+          description: The id of the company to retrieve
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyIdless'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /company/{symbol}/history:
+    get:
+      summary: List price historic of specif symbol
+      operationId: listCompanyHistoric
+      tags:
+        - company
+      parameters:
+        - name: symbol
+          in: path
+          description: symbol to query
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: One month of company prices
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyHistoric"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /user/auth:
+    post:
+      tags:
+        - User
+      summary: User login
+      description: Authentication endpoint that returns JWT Tokens;
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userAuthResponse'
+        '400':
+          description: invalid input, object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userAuthErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userAuthRequest'
+        description: User data to validate
+
+  /user/refresh:
+    post:
+      tags:
+        - User
+      summary: Renovar token de acesso
+      description: Renovar token de acesso após tempo de expiração sem a necessidade de informar usuário e senha novamente. Nesse caso será enviado somente o refresh_token que é recebido no endpoint /user/auth. O retorno do presente endpoint será um novo token de acesso que será informado no header Authorization de qualquer requisição.
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRefreshAuthResponse'
+
+  /user:
+    post:
+      tags:
+        - User
+      summary: Cadastrar cliente ao banco
+      description: Enpoint para cadastro de clientes
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userAddResponse'
+        '400':
+          description: invalid input, obejct invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userAddValidationErrorrResonse'
+        '409':
+          description: integrity error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userAddErrorrResonse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userAddRequest'
+        description: Json de cadastro
+  /users:
+    get:
+      tags:
+        - User
+      summary: List all users
+      description: Enpoint used to list all users in database
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userAllResponse'
+  /user/{user_id}:
+    get:
+      tags:
+        - User
+      summary: Get specific user
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        description: The id of the user to retrieve
+        schema:
+          type: integer
+      description: Endpoint to retrieve specific user
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userViewResponse'
+        '409':
+          description: register not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - User
+      summary: Edit a specific user
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        description: The id of the user to edit
+        schema:
+          type: integer
+
+      description: Endpoint used to edit specifc user
+      responses:
+        '200':
+            description: success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/userEditResponse'
+        '400':
+            description: invalid input, object
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/userEditValidateError'
+        '409':
+            description: integrity error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/userEditErrorResponse'
+
+      requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userEditRequest'
+
+
+    delete:
+      tags:
+        - User
+      summary: Delete a user
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        description: The id of the clien to delete
+        schema:
+          type: integer
+
+      description: Specific endpoint to delete a user
+      responses:
+        '200':
+            description: success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Success'
+        '400':
+            description: invalid input, object
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        '409':
+            description: integrity error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+
+
+components:
+  schemas:
+    Company:
+      type: object
+      required:
+        - id
+        - name
+        - peso
+        - symbol
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        peso:
+          type: number
+        symbol:
+          type: string
+    CompanyIdless:
+      type: object
+      required:
+        - name
+        - peso
+        - symbol
+      properties:
+        name:
+          type: string
+        peso:
+          type: number
+        symbol:
+          type: string
+    CompanyHistoric:
+      type: object
+      required:
+        - has_error
+        - history
+        - id
+        - peso
+        - symbol
+      properties:
+        has_error:
+          type: boolean
+        history:
+          type: array
+          items:
+            type: object
+            required:
+              - company_id
+              - date
+              - id
+              - price_closed
+              - price_opened
+            properties:
+              company_id:
+                type: integer
+              date:
+                type: integer
+              id:
+                type: integer
+              price_closed:
+                type: number
+              price_opened:
+                type: number
+    userViewResponse:
+      type: object
+      properties:
+        email:
+          type: string
+          example: "pontotel@ifce.com"
+        id:
+          type: integer
+          example: 1
+        role:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: "administrador"
+
+        role_id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "admin"
+
+    userViewErrorResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: False
+        message:
+          type: string
+          example: "Registro Cod. 1 não encontrado no sistema."
+
+    userEditResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Registro de Cod. 1 atualizado com sucesso."
+        error:
+          type: boolean
+          example: False
+
+    userEditErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Não foi possível modificar o registro. Verifique os dados e tente novamente."
+        error:
+          type: boolean
+          example: True
+
+    userEditValidateError:
+     type: object
+     properties:
+        error:
+          type: boolean
+          example: True
+        errors:
+          type: object
+          properties:
+            fields:
+              type: object
+              properties:
+                username:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: "Campo não informado"
+            form:
+              type: array
+              items:
+                example:
+            has:
+              type: boolean
+              example: True
+        message:
+          type: string
+          example: "Ocorreram erros no preenchimento do formulário."
+
+
+
+
+
+    userRefreshAuthResponse:
+      type: object
+      required:
+        - access_token
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNmRkNTliYS1iOGViLTQ2MTktYTA2My03NjBhY2M1NTMxOWQiLCJuYmYiOjE1NjM3MTYxNDksImlhdCI6MTU2MzcxNjE0OSwiZXhwIjoxNTYzNzE3MDQ5LCJpZGVudGl0eSI6MSwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.5E--lw6MqtSXq9_VCEQlujdUnNUJiD7oLSyLqB9mBQI
+
+    userAuthErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: "Ocorreram erros no preenchimento do formulário."
+
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+
+              fields:
+                type: object
+              form:
+                type: array
+                items:
+                  type: object
+                  properties:
+
+                    message:
+                      type: string
+                      example: "O usuário informado não foi cadastrado na base de dados."
+
+    userAddResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: False
+        message:
+          type: string
+          example: "Registro de usuario criado com sucesso"
+
+    userAddValidationErrorrResonse:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: True
+        errors:
+          type: object
+          properties:
+            fields:
+              type: object
+              properties:
+                username:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: "Campo não informado"
+            form:
+              type: array
+              items:
+                example:
+            has:
+              type: boolean
+              example: True
+        message:
+          type: string
+          example: "Ocorreram erros no preenchimento do formulário."
+
+    userAddErrorrResonse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Não foi possível criar o registro. Verifique os dados e tente novamente."
+        error:
+          type: boolean
+          example: True
+
+
+
+    userAuthResponse:
+      type: object
+      required:
+        - access_token
+        - refresh_token
+        - user_role
+
+      properties:
+
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNmRkNTliYS1iOGViLTQ2MTktYTA2My03NjBhY2M1NTMxOWQiLCJuYmYiOjE1NjM3MTYxNDksImlhdCI6MTU2MzcxNjE0OSwiZXhwIjoxNTYzNzE3MDQ5LCJpZGVudGl0eSI6MSwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.5E--lw6MqtSXq9_VCEQlujdUnNUJiD7oLSyLqB9mBQI
+
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMGY4ZTA3OS0zNGEwLTQ1N2UtYTg4NC0yZTQxMzcwNTNjYjQiLCJuYmYiOjE1NjM3MTYxNDksImlhdCI6MTU2MzcxNjE0OSwidHlwZSI6InJlZnJlc2giLCJleHAiOjE1NjYzMDgxNDksImlkZW50aXR5IjoxfQ.sYsKMkuFFBRfat3Ju2pHaZKsrpIabng7s4Gb77JPRoY
+
+        user_role:
+          type: integer
+          example: 1
+
+    userAuthRequest:
+      type: object
+      required:
+        - username
+        - password
+
+      properties:
+
+        username:
+          type: string
+          example: admin
+
+        password:
+          type: string
+          example: 123456
+
+    userAddRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "pontotel"
+        password:
+          type: string
+          example: "root1234"
+        email:
+          type: string
+          example: "pontotel@ifce.com"
+        role_id:
+          type: string
+          example: "0"
+
+    userEditRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "pontotel"
+        password:
+          type: string
+          example: "root1234"
+        email:
+          type: string
+          example: "pontotel@ifce.com"
+        role_id:
+          type: string
+          example: "0"
+
+
+
+
+        id:
+          type: integer
+        peso:
+          type: number
+        symbol:
+          type: string
+    Companies:
+      type: object
+      required:
+        - has_error
+        - itens
+        - peso
+        - symbol
+      properties:
+        has_error:
+          type: boolean
+        itens:
+          type: array
+          items:
+            $ref: "#/components/schemas/Company"
+    Success:
+      type: object
+      required:
+        - has_error
+        - message
+      properties:
+        has_error:
+          type: boolean
+        message:
+          type: string
+    Error:
+      type: object
+      required:
+        - has_error
+        - message
+      properties:
+        has_error:
+          type: boolean
+        message:
+          type: string
+    userAllResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: False
+        items:
+         type: array
+         items:
+           type: object
+           properties:
+              email:
+                type: string
+                example: "pontotel@ifce.com"
+              id:
+                type: integer
+                example: 1
+              role:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: "administrador"
+
+              role_id:
+                type: integer
+                example: 1
+              username:
+                type: string
+                example: "admin"
+    Stock:
+      type: object
+      required:
+        - has_error
+        - price
+      properties:
+        has_error:
+          type: boolean
+        price:
+          type: integer
