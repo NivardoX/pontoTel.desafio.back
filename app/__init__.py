@@ -18,17 +18,12 @@ if os.environ.get("STAGE", None) == "test":
     app.config["SQLALCHEMY_DATABASE_URI"] = TEST_DB_URL
 
 db = SQLAlchemy(app)
-
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
-
 manager = Manager(app)
-
 manager.add_command("db", MigrateCommand)
 
-
 context = zmq.Context()
-
 socket = context.socket(zmq.REQ)
 socket.connect("tcp://localhost:5555")
 socket.setsockopt(zmq.LINGER, 0)

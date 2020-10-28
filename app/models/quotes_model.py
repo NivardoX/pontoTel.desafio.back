@@ -38,8 +38,5 @@ class Quote(db.Model):
         dictret = dict(self.__dict__)
         dictret.pop("_sa_instance_state", None)
 
-        dictret["date"] = int((self.date-timedelta(hours=3)).strftime("%s") + "000")
+        dictret["date"] = int((self.date - timedelta(hours=3)).strftime("%s") + "000")
         return dictret
-
-
-
