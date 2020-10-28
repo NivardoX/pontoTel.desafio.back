@@ -249,8 +249,8 @@ paths:
     post:
       tags:
         - User
-      summary: Renovar token de acesso
-      description: Renovar token de acesso após tempo de expiração sem a necessidade de informar usuário e senha novamente. Nesse caso será enviado somente o refresh_token que é recebido no endpoint /user/auth. O retorno do presente endpoint será um novo token de acesso que será informado no header Authorization de qualquer requisição.
+      summary: Refresh access tokens
+      description: Endpoint used to refresh access tokens without sending user info
       responses:
         '200':
           description: success
@@ -263,8 +263,8 @@ paths:
     post:
       tags:
         - User
-      summary: Cadastrar cliente ao banco
-      description: Enpoint para cadastro de clientes
+      summary: Add new user
+      description: Endpoint used to add new users in database
       responses:
         '200':
           description: success
